@@ -2,6 +2,7 @@
 102,double,2,700,yes,available
 103,double,2,650,no,unavailable
 104,single,1,550,no,available
+203,double,2,700,yes,available
 205,suite,3,1000,yes,unavailable
 210,suite,4,1500,no,available
 211,suite,4,2000,yes,unavailable

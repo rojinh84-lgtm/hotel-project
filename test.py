@@ -48,3 +48,100 @@ if matches:
         print(r)
 else:
     print("No rooms found matching the criteria.")
+
+
+from datetime import datetime
+
+ask_to_filter_booking = input(
+    'Do you want to filter rooms based on check in and check out dates? (yes/no) ').strip().lower()
+
+if ask_to_filter_booking == 'yes':
+
+    check_in_date = input("Enter check-in date (YYYY-MM-DD): ").strip()
+    check_out_date = input("Enter check-out date (YYYY-MM-DD): ").strip()
+
+    check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d")
+    check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d")
+
+else:
+    check_in_date = None
+    check_out_date = None
+
+    
+
+
+
+
+from datetime import datetime
+class Booking :
+     def __init__(self, room, username, check_in_date, check_out_date, booking=None):
+          self.room = room
+          self.username = username
+          self.check_in_date = check_in_date
+          self.check_out_date = check_out_date
+          
+
+          
+
+     
+     @classmethod
+     def load_bookings(cls):
+          try:
+                list_of_bookings = []
+                with open("bookings.txt", "r") as f:
+                    data = f.readlines()
+                    for line in data:
+                        r, u, c_i, c_o  = line.strip().split(",")
+                        c_i = datetime.strptime(c_i, "%Y-%m-%d")
+                        c_o = datetime.strptime(c_o, "%Y-%m-%d")
+                        list_of_bookings.append(Booking(r, u, c_i, c_o))
+                # a list of all reservations
+                return list_of_bookings
+          except FileNotFoundError:
+                print("No bookings found. Please book a room first.")
+                return []
+          
+
+
+     
+         
+     
+     @staticmethod
+     def filter_bookings_by_date(bookings, check_in_date, check_out_date):
+
+        filtered_bookings = []
+
+        for booking in bookings:
+            c_i = booking.check_in_date
+            c_o = booking.check_out_date
+
+            if check_in_date <= c_o and check_out_date >= c_i:
+                filtered_bookings.append(booking)
+
+        return filtered_bookings
+     
+          
+     def __str__(self):
+      return f"Room {self.room} | {self.check_in_date.strftime('%Y-%m-%d')} → {self.check_out_date.strftime('%Y-%m-%d')}"
+
+    
+
+bookings = Booking.load_bookings()
+
+if check_in_date and check_out_date:
+    conflicts = Booking.filter_bookings_by_date(
+        bookings, check_in_date, check_out_date
+    )
+    new_list = [x for x in bookings if x not in conflicts]
+else:
+    new_list = bookings
+
+for b in new_list:
+    print(b)
+
+
+
+
+
+
+
