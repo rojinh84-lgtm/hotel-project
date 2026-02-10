@@ -246,7 +246,7 @@ class Booking :
      def load_bookings(cls):
           try:
                 list_of_bookings = []
-                with open("bookings.txt", "r") as f:
+                with open("booking.txt", "r") as f:
                     data = f.readlines()
                     for line in data:
                         r, u, c_i, c_o  = line.strip().split(",")
@@ -320,6 +320,126 @@ if available_rooms:
 else:
     print("Sorry, no rooms available for the selected dates.")
 
+ask_user_to_book = input(' do you want to book a room? (yes/no) ').strip().lower()
+sure = input ( 'Are you sure about the time you entered? (yes/no) ').strip().lower()
+if ask_user_to_book == 'yes':
+    room_number_to_book = input("Enter the room number you want to book: ").strip()
+    # Here you would add logic to create a booking, update the room status, and save the booking to file.
+    print(f"You have chosen to book room {room_number_to_book}. (Booking logic not implemented in this snippet.)")
+    print('system is loading your booking... (This is a placeholder for the actual booking process.)')
+
+if sure =='yes':
+    print('Great! We will proceed with the booking process. (This is a placeholder for the actual booking process.)')
+else:
+    print('No problem! You can adjust your dates and try again. (This is a placeholder for the actual booking process.)')
 
 
 
+
+
+
+
+class Booking_management_system:
+    def __init__(self):
+         pass
+    def loud_room(self, room_number, username, check_in_date, check_out_date):  
+        # Here you would add logic to create a booking, update the room status, and save the booking to file.
+        print(f"You have chosen to book room {room_number}. (Booking logic not implemented in this snippet.)")
+        with open("rooms.txt","r") as f:
+            data=f.readlines()
+            for line in data:
+                r_n, r_t, c, p, h_w, s  = line.strip().split(",")
+                if r_n == room_number:
+                    print(f" here is the room you have chosen: \n"
+                          f"Room {r_n}: {r_t}, Capacity: {c}, Price: ${p}, WiFi: {h_w}, Status: {s}")
+                    return int(p)
+        print("Room not found")
+        return None
+            
+    def check_credit_and_pay(self, username, room_number, check_in_date, check_out_date):
+        
+        self.room_number = room_number
+        
+        with open("rooms.txt", "r") as f:
+            l= f.readlines()
+            for line in l:
+                r_n, r_t, c, p, h_w, s  = line.strip().split(",")
+                if r_n == room_number:
+                    nights = (check_out_date - check_in_date).days
+                    total_price = int(p) * nights
+                    print(f"The total price for your stay from {check_in_date.strftime('%Y-%m-%d')} to {check_out_date.strftime('%Y-%m-%d')} is: ${total_price}")
+                    break
+                    # Here you would add logic to check if the user's credit is sufficient for the total price and proceed with the booking accordingly.
+
+
+        with open("users.txt", "r") as f:
+            data = f.readlines()
+
+            new_lines = []
+
+            for line in data:
+                u, p, c, nf = line.strip().split(",")
+
+                if u == username:
+                    if int(c) >= int(total_price):
+                        print(f"Your credit is sufficient to book this room. Your current credit: ${c}")
+                        
+                        new_credit = int(c) - int(total_price)
+                        print(f"After booking, your new credit will be: ${new_credit}")
+                        # Here you would add logic to update the user's credit in the file and confirm the booking.
+                        print("Booking confirmed! (This is a placeholder for the actual booking confirmation process.)")
+                    else:
+                        print(f"Your credit is insufficient to book this room. Your current credit: ${c}")
+                        print("Please add more credit to your account or choose a different room. (This is a placeholder for the actual process.)")
+                        print('enter more credit to your account: (This is a placeholder for the actual process.)')
+
+                        new_credit_input = input("Enter the amount of credit you want to add: ").strip()
+                        new_credit = int(c) + int(new_credit_input)
+
+                        print(f"Your new credit after adding will be: ${new_credit}")
+                        # Here you would add logic to update the user's credit in the file and allow them to  attempt booking again.
+             
+                        print("Please try booking again with your updated credit. (This is a placeholder for the actual process.)")
+            new_lines.append(f"{u},{p},{new_credit},{nf}\n")
+        with open("users.txt", "w") as f:
+            f.writelines(new_lines)
+
+        return True
+    def finalize_booking(self, room_number, username, check_in_date, check_out_date):
+        
+        with open("booking.txt", "a") as f:
+            f.write(f"{room_number},{username},{check_in_date.strftime('%Y-%m-%d')},{check_out_date.strftime('%Y-%m-%d')}\n")
+        print("Your booking has been finalized and saved.")
+
+
+    def show_all_bookings(self, username):
+        with open("booking.txt", "r") as f:
+            bookings = f.readlines()
+
+        found = False
+
+        for booking in bookings:
+            room_number, u, check_in_date, check_out_date = booking.strip().split(',')
+
+            if u == username:
+                print(f"Room {room_number}: {check_in_date} → {check_out_date}")
+                found = True
+
+        if not found:
+            print("no bookings found")
+
+    def cancel_booking(self, username):
+        print("if you want to cancel a booking, please enter the room number and the check-in date of the booking you want to cancel.")
+        print("remember you can only cancel for 48 hours after reserving the room")
+        room_number_to_cancel = input("Enter the room number of the booking you want to cancel: ").strip()
+        with open("booking.txt", "r") as f:
+            bookings = f.readlines()
+        with open("booking.txt", "w") as f:
+            for booking in bookings:
+                room_number, u, c_i, c_o = booking.strip().split(',')
+
+                #  check both room and user
+                if not (room_number == room_number_to_cancel and u == username):
+                    f.write(booking)
+
+        print("cancel done if existed")

@@ -1,2 +1,2 @@
-geniale,12345,670000,rozhin hesadi 
+geniale,12345,6700,rozhin hesadi 
     
