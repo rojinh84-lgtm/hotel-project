@@ -140,7 +140,9 @@ for b in new_list:
     print(b)
 
 
-
+print("----- Cancel Booking -----")
+room_number_to_cancel = input("Enter room number to cancel booking: ").strip()
+username = input("Enter your username: ").strip()                   
 
 
 

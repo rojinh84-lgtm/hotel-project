@@ -6,3 +6,4 @@
 205,suite,3,1000,yes,unavailable
 210,suite,4,1500,no,available
 211,suite,4,2000,yes,unavailable
+
