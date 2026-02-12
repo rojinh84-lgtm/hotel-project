@@ -18,34 +18,42 @@ class User:
         username = input("Enter your username: ")
         password = input("Enter your password: ")
         credit = int(input("Enter your credit: "))
-        user = f"{name} {family_name} "
+        user = f"{name}{family_name} "
         
         # Check if the username already exists in the file
         try:
             with open("users.txt", "r") as f:
                 data = f.readlines()
+                
                 for line in data:
-                        u, p, c, nf = line.strip().split(",")
-                        
-                        if u == username:
+                            parts = line.strip().split(",")
+                            if len(parts) != 4:
+                                print(f"Skipping invalid line: {line}")
+                                continue
+                            u, p, c, nf = parts
 
-                            print("Username already exists please choose a different username or login.")
-                            n = input("Do you want to login instead? (yes/no) ").strip().lower() 
-                            if n == "yes":
-                                self.login()
-                            else:
-                                print("Please try signing up again with a different username.")
-                            return User(username, password, credit, user)
+                        
+                            if u == username:
+
+                                print("Username already exists please choose a different username or login.")
+                                n = input("Do you want to login instead? (yes/no) ").strip().lower() 
+                                if n == "yes":
+                                    self.login()
+                                else:
+                                    print("Please try signing up again with a different username.")
+                                return User(username, password, credit, user)
                 
         except  FileNotFoundError:
                 pass 
     
-
+        
+                
 
         with open("users.txt", "a") as f:
+            f.write("\n")
             f.write(f"{username},{password},{credit},{user}\n" )
         print(' you have succesfully added!!')
-        return Booking_management_system(username, password, credit, user)
+        return User(username, password, credit, user)
 
     def login(self):
         username = input("Enter your username: ")
@@ -63,8 +71,9 @@ class User:
                         u, p, c, nf = line.strip().split(",")
                         if u == username and p ==password:
                             print(f"welcome back {nf}\n")
-                                
-                            return User(u, p, int(c), nf)
+                            user = User(u, p, int(c), nf)  
+                            user.user_panel()
+                            return user
         print("Invalid username or password. Please try again.")
         
         again = input("Try again? (yes/no) ").strip().lower()
@@ -109,9 +118,42 @@ class User:
             print("No users found. Please sign up first.")
             return []   
         
+    def user_panel(self):
+   
+        manager = Booking_management_system(self.username, self.password, self.credit, self.name_family)
 
-welcome = User("","","","").menu()
-print(welcome)   
+        while True:
+            print("\nUser Panel")
+            print("1. Book room")
+            print("2. Show my bookings")
+            print("3. Cancel booking")
+            print("4. Exit")
+
+            ch = input("Choose one option: ")
+
+            if ch == "1":
+                room = input("room number: ")
+                ci = datetime.strptime(input("check in YYYY-MM-DD: "), "%Y-%m-%d")
+                co = datetime.strptime(input("check out YYYY-MM-DD: "), "%Y-%m-%d")
+
+                ok = manager.check_credit_and_pay(self.username, room, ci, co)
+                
+
+                if ok:
+                    manager.finalize_booking(room, self.username, ci, co)
+
+            elif ch == "2":
+                manager.show_all_bookings(self.username)
+
+            elif ch == "3":
+                manager.cancel_booking(self.username)
+
+            elif ch == "4":
+                break
+
+        
+
+   
 
 
 
@@ -396,10 +438,17 @@ class Booking_management_system(User):
         
         with open("rooms.txt", "r") as f:
             l= f.readlines()
+
+            found_room = False
+
             for line in l:
                 r_n, r_t, c, p, h_w, s  = line.strip().split(",")
                 if r_n == room_number:
                     nights = (check_out_date - check_in_date).days
+                    if nights <= 0:
+                        print("Invalid date range")
+                        return False
+
                     total_price = int(p) * nights
                     print(f"The total price for your stay from {check_in_date.strftime('%Y-%m-%d')} to {check_out_date.strftime('%Y-%m-%d')} is: ${total_price}")
                     found_room = True
@@ -593,3 +642,8 @@ class Booking_management_system(User):
             print("because you cancelling your booking less than 48 hours before the check-in date, you will be refunded only 50% of the total price. Your booking has been cancelled.")
         print("cancel done if existed")
    
+
+
+
+if __name__ == "__main__":
+    User(None, None, None, None).menu()
