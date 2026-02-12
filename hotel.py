@@ -1,5 +1,5 @@
 #starting with sign in and sign up page for user
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 User_file = "users.txt"
@@ -29,8 +29,13 @@ class User:
                         
                         if u == username:
 
-                            print("Username already exists ❌")
-                            return 
+                            print("Username already exists please choose a different username or login.")
+                            n = input("Do you want to login instead? (yes/no) ").strip().lower() 
+                            if n == "yes":
+                                self.login()
+                            else:
+                                print("Please try signing up again with a different username.")
+                            return User(username, password, credit, user)
                 
         except  FileNotFoundError:
                 pass 
@@ -40,6 +45,7 @@ class User:
         with open("users.txt", "a") as f:
             f.write(f"{username},{password},{credit},{user}\n" )
         print(' you have succesfully added!!')
+        return Booking_management_system(username, password, credit, user)
 
     def login(self):
         username = input("Enter your username: ")
@@ -56,18 +62,22 @@ class User:
         for line in data:
                         u, p, c, nf = line.strip().split(",")
                         if u == username and p ==password:
-                            print(f"welcome back {nf}\n"
-                                "1. Book a room\n"
-                                "2. View your bookings\n"
-                                "3. Cancel a booking\n")
-                            return u, p, c, nf 
-              
-        print("Invalid username or password. Please try again. or sign up if you don't have an account.")
+                            print(f"welcome back {nf}\n")
+                                
+                            return User(u, p, int(c), nf)
+        print("Invalid username or password. Please try again.")
+        
+        again = input("Try again? (yes/no) ").strip().lower()
+
+        if again == "yes":
+            return self.login()
+        else:
+            return self.signup()
     
     def menu (self):
  # main menu using while loop
         while True:
-            print("Welcome to the hotel booking system!")
+            print("Welcome to the Rozhin's hotel booking system!")
             print("1. Sign up")
             print("2. Log in")
             print("3. Exit")
@@ -98,7 +108,13 @@ class User:
         except FileNotFoundError:
             print("No users found. Please sign up first.")
             return []   
-    
+        
+
+welcome = User("","","","").menu()
+print(welcome)   
+
+
+
     
 # room management system
 class Room:
@@ -353,9 +369,13 @@ def credit_increase(username):
 
 
 
-class Booking_management_system:
-    def __init__(self):
-         pass
+class Booking_management_system(User):
+    
+    def __init__(self, username, password, credit, name_family):
+        super().__init__(username, password, credit, name_family)
+
+
+
     def load_room(self, room_number, username, check_in_date, check_out_date):  
         # Here you would add logic to create a booking, update the room status, and save the booking to file.
         print(f"You have chosen to book room {room_number}. (Booking logic not implemented in this snippet.)")
@@ -382,10 +402,11 @@ class Booking_management_system:
                     nights = (check_out_date - check_in_date).days
                     total_price = int(p) * nights
                     print(f"The total price for your stay from {check_in_date.strftime('%Y-%m-%d')} to {check_out_date.strftime('%Y-%m-%d')} is: ${total_price}")
+                    found_room = True
                     break
-                else:
-                    print("Room not found")
-                    return False
+            if not found_room:
+                print("Room not found")
+                return False
 
                     # Here you would add logic to check if the user's credit is sufficient for the total price and proceed with the booking accordingly.
 
@@ -449,7 +470,41 @@ class Booking_management_system:
         print("Your booking has been finalized and saved.")
 
 
+    from datetime import datetime
+    # This function will automatically change the status of bookings to "finished" .
+    def auto_finish_bookings(self):
+        today = datetime.today()
+
+        with open("booking.txt", "r") as f:
+            lines = f.readlines()
+
+        new_lines = []
+
+        for line in lines:
+            r_n, u, c_i, c_o, status = line.strip().split(",")
+
+            check_out_date = datetime.strptime(c_o, "%Y-%m-%d")
+
+            if status == "active" and today > check_out_date:
+                status = "finished"
+
+            new_lines.append(f"{r_n},{u},{c_i},{c_o},{status}\n")
+
+        with open("booking.txt", "w") as f:
+            f.writelines(new_lines)
+
+
+
+
+
+
+
+
+
+
     def show_all_bookings(self, username):
+
+        self.auto_finish_bookings()
 
         with open("booking.txt", "r") as f:
             bookings = f.readlines()
@@ -463,7 +518,7 @@ class Booking_management_system:
         if not found:
             print("No bookings found for this user.")
 
-
+    #filter file for active bookings only and show them to the user
     def show_active_bookings(self, username):
 
         with open("booking.txt", "r") as f:
@@ -492,13 +547,49 @@ class Booking_management_system:
         with open("booking.txt", "w") as f:
             for booking in bookings:
                 room_number, u, c_i, c_o, status = booking.strip().split(',')
+                check_in_date = datetime.strptime(c_i, "%Y-%m-%d")
+                check_out_date = datetime.strptime(c_o, "%Y-%m-%d")
+
 
                 #  check both room and user
                 if room_number == room_number_to_cancel and u == username:
                     f.write(f"{room_number},{u},{c_i},{c_o},cancelled\n")
                 else:
                     f.write(booking)
-
-
+        a = input('enter time to confirm cancellation: ')
+        time = datetime.strptime(a, "%Y-%m-%d")
+        
+        nights = (check_out_date - check_in_date).days
+        
+        with open("rooms.txt", "r") as f:
+            l= f.readlines()
+            for line in l:
+                
+                r_n, r_t, c, p, h_w, s  = line.strip().split(",")
+                if r_n == room_number_to_cancel:
+                    total_price = int(p) * nights
+                    break
+        if time - check_in_date >= timedelta(hours=48):
+             with open("users.txt", "r") as f:
+                lines = f.readlines()
+             with open("users.txt", "w") as f:
+                for line in lines:
+                    u, p, c, nf = line.strip().split(",")
+                    if u == username:
+                        f.write(f"{u},{p},{int(c) + total_price},{nf}\n")
+                    else:
+                        f.write(line)
+             print("your credit has been refunded and your booking has been cancelled.")
+        else:
+            with open("users.txt", "r") as f:
+                lines = f.readlines()
+            with open("users.txt", "w") as f:
+                for line in lines:
+                    u, p, c, nf = line.strip().split(",")
+                    if u == username:
+                        f.write(f"{u},{p},{int(c) + (total_price // 2)},{nf}\n")
+                    else:
+                        f.write(line)
+            print("because you cancelling your booking less than 48 hours before the check-in date, you will be refunded only 50% of the total price. Your booking has been cancelled.")
         print("cancel done if existed")
    
