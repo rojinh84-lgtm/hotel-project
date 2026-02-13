@@ -1,3 +1,4 @@
-geniale,12345,670,rozhinhesadi
+geniale,12345,2670,rozhinhesadi
 ksadegh,1349,1000,keyvansadeghi 
 bel,9522,721,bellahadid 
+samiin,3612,890,saminhesadi

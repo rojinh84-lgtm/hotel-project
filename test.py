@@ -147,3 +147,17 @@ username = input("Enter your username: ").strip()
 
 
 
+ask_to_filter_booking = input(
+    'Do you want to filter rooms based on check in and check out dates? (yes/no) ').strip().lower()
+
+if ask_to_filter_booking == 'yes':
+
+    check_in_date = input("Enter check-in date (YYYY-MM-DD): ").strip()
+    check_out_date = input("Enter check-out date (YYYY-MM-DD): ").strip()
+
+    check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d")
+    check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d")
+
+else:
+    check_in_date = None
+    check_out_date = None
