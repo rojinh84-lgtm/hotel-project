@@ -6,3 +6,4 @@
 203,sara,2026-02-01,2026-02-03,finished
 210,amir,2025-10-21,2025-10-27,finished
 101,samin,2025-09-30,2025-10-03,cancelled
+203,geniale,2026-02-15,2026-02-18,cancelled

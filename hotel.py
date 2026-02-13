@@ -108,16 +108,7 @@ class User:
                     return True
         return False
     #useless function but we can use it to load users from the file and return a list of users that we can use to check if the username already exists or not in the signup function and also to check if the username and password are correct in the login function        
-    
-        
-    
-        
 
-   
-
-
-
-    
 # room management system
 class Room:
       
@@ -151,10 +142,7 @@ class Room:
 
 
 # a list of rooms that we can use to add rooms to it and also to filter rooms based on criteria            
-
-
-        
-    
+  
 class Room_management_system:
     def __init__(self, rooms=None):
          self.rooms = rooms if rooms is not None else Room.load_rooms()
@@ -179,69 +167,6 @@ class Room_management_system:
         return filtered_rooms
     
 
-# now we want to show room list to the user and ask them to choose a room to book and then we can change the status of the room to booked and also we can add the booking to the user's bookings list and also we can add the booking to the bookings.
-# txt file for whenever bookings are loaded again(depending on time that user books a room)
-
-'''
-show_room_list = Room.load_rooms()
-i = input("do you want to see available rooms?")
-if i =='yes':
-    print(f" here is the list of rooms available in our hotel: \n")
-    for room in show_room_list:
-        print(room)
-    print(f" to book easier  you can filter rooms based on criteria such as room type, capacity, price, wifi and status and return a list of rooms that match the criteria \n")
-    ask_to_filter =input('do you want to filter rooms based on criteria? (yes/no) ')
-
-    if ask_to_filter.lower() == 'yes':
-        room_type = input("Enter room type (single/double/suite) or leave blank to skip: ").strip()
-        max_price_input = input("Enter maximum price or leave blank to skip: ").strip()
-        max_price = int(max_price_input) if max_price_input else None
-        wifi = input("Do you want a room with WiFi? (yes/no) or leave blank to skip: ").strip()
-        manager = Room_management_system(show_room_list)
-
-        print("ROOM COUNT:", len(manager.rooms))
-
-
-        filtered_rooms = manager.filter_rooms(
-        room_type or None,
-        max_price,
-        wifi or None,
-        
-    )
-
-
-        if filtered_rooms:
-            print("Here are the rooms that match your criteria:")
-            for room in filtered_rooms:
-                print(room)
-        else:
-            print("No rooms found matching the criteria.")
-else:
-    print("we can pass")
-
-
-
-
-ask_to_filter_booking = input(
-    'Do you want to filter rooms based on check in and check out dates? (yes/no) ').strip().lower()
-
-if ask_to_filter_booking == 'yes':
-
-    check_in_date = input("Enter check-in date (YYYY-MM-DD): ").strip()
-    check_out_date = input("Enter check-out date (YYYY-MM-DD): ").strip()
-
-    check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d")
-    check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d")
-
-else:
-    check_in_date = None
-    check_out_date = None
-
-    '''
-
-
-
-
 from datetime import datetime
 class Booking :
      def __init__(self, room, username, check_in_date, check_out_date,status):
@@ -252,10 +177,6 @@ class Booking :
           self.status = status
           
 
-          
-
-     
-     
      @classmethod
      def load_bookings(cls):
         bookings = []
@@ -286,43 +207,6 @@ class Booking :
 
 # Right after you have parsed check_in_date and check_out_date
 # (and after you possibly showed/filtered rooms)
-'''
-all_rooms = Room.load_rooms()
-all_bookings = Booking.load_bookings()
-
-available_rooms = []
-
-for room in all_rooms:
-
-    if room.status.lower() != "available":
-        continue
-
-    booked = False
-
-    for booking in all_bookings:
-
-        if booking.status != "active":
-            continue
-
-        if booking.room == room.room_number:
-
-            if Booking.overlap(
-                check_in_date,
-                check_out_date,
-                booking.check_in_date,
-                booking.check_out_date
-            ):
-                booked = True
-                break
-
-    if not booked:
-        available_rooms.append(room)
-
-
-print("\nAvailable rooms:")
-for r in available_rooms:
-    print(r)'''
-
 
 #here we have fcntion to increase credit we usre it when user doesn't have enough credit to book a room
 def credit_increase(username):
