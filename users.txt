@@ -2,3 +2,4 @@ geniale,12345,1620,rozhinhesadi
 ksadegh,1349,1000,keyvansadeghi 
 bel,9522,721,bellahadid 
 samiin,3612,890,saminhesadi
+amirr,1385,233,amirakbari

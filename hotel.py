@@ -224,6 +224,69 @@ def credit_increase(username):
 
 
 
+from datetime import datetime
+#use this class for rating room by users who had been in hotel
+class Rating:
+    def __init__(self, room_number, username, rating, comment="", timestamp=None):
+        self.room_number = room_number
+        self.username = username
+        self.rating = int(rating)
+        self.comment = comment.strip()
+        self.timestamp = timestamp or datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    @classmethod
+    def load_ratings(cls):
+        ratings = []
+        if not os.path.exists("ratings.txt"):
+            return ratings
+        with open("ratings.txt", "r") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                parts = line.strip().split(",", 4)  # split max 4 times → last part is comment
+                if len(parts) < 3:
+                    continue
+                try:
+                    room, user, rat = parts[0], parts[1], int(parts[2])
+                    comment = parts[3] if len(parts) >= 4 else ""
+                    ratings.append(cls(room, user, rat, comment))
+                except:
+                    continue
+        return ratings
+
+    @staticmethod
+    def get_average_rating(room_number):
+        ratings = Rating.load_ratings()
+        room_ratings = [r.rating for r in ratings if r.room_number == room_number]
+        if not room_ratings:
+            return 0.0
+        return round(sum(room_ratings) / len(room_ratings), 1)
+
+    @staticmethod
+    def get_rating_count(room_number):
+        ratings = Rating.load_ratings()
+        return len([r for r in ratings if r.room_number == room_number])
+
+    def save(self):
+        need_newline = os.path.exists("ratings.txt") and os.path.getsize("ratings.txt") > 0
+        with open("ratings.txt", "a", encoding="utf-8") as f:
+            if need_newline:
+                f.write("\n")
+            line = f"{self.room_number},{self.username},{self.rating}"
+            if self.comment:
+                line += f",{self.comment}"
+            f.write(line)
+
+    def __str__(self):
+                avg = Rating.get_average_rating(self.room_number)
+                count = Rating.get_rating_count(self.room_number)
+                rating_text = f" ★ {avg}/5 ({count})" if count > 0 else " (no ratings yet)"
+                return (f"Room {self.room_number}: {self.room_type}, "
+                        f"Capacity: {self.capacity}, Price: ${self.price}, "
+                        f"WiFi: {self.has_wifi}, Status: {self.status}{rating_text}")
+
+
+
 
 class Booking_management_system(User):
     
@@ -499,6 +562,29 @@ class Booking_management_system(User):
 
         print("Cancellation done + credit refunded")
 
+
+    def rate_room(self):
+        print("\n Rate a past stay ")
+         # show history so user knows what to rate
+        self.show_all_bookings(self.username)  
+
+        room_number = input("Which room number do you want to rate? ").strip()
+        try:
+            rating = int(input("Rating (1–5): "))
+            if not 1 <= rating <= 5:
+                print("Rating must be between 1 and 5.")
+                return
+        except ValueError:
+            print("Invalid number.")
+            return
+
+        comment = input("Comment (optional, press Enter to skip): ").strip()
+
+        # Save rating
+        new_rating = Rating(room_number, self.username, rating, comment)
+        new_rating.save()
+        print("Thank you for your feedback!")
+
    
 def main_menu():
     while True:
@@ -535,7 +621,7 @@ if __name__ == "__main__":
             logged_in_user.name_family
         )
 
-        # منوی اصلی کاربر
+        
     while True:
             print("\n--- Main Menu ---")
             print("1. Book a room")
@@ -543,7 +629,8 @@ if __name__ == "__main__":
             print("3. Cancel booking")
             print("4. show available room")
             print("5. show active rooms")
-            print("6. Exit")
+            print("6. Rate a room you stayed in")
+            print("7. Exit")
 
             choice = input("Enter choice: ").strip()
 
@@ -625,7 +712,7 @@ if __name__ == "__main__":
                 available_rooms = []
 
                 for room in all_rooms:
-                    if room.status.lower() != "available":   # you may want to remove this line
+                    if room.status.lower() != "available":   
                         continue
                     booked = False
                     for booking in all_bookings:
@@ -649,7 +736,9 @@ if __name__ == "__main__":
                 else:
                     for r in available_rooms:
                         print(r)
-            elif choice =='6':
+            elif choice == "6":
+                bms.rate_room()           
+            elif choice =='7':
                 break            
             else:
                 print("Invalid choice")

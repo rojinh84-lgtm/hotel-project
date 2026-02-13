@@ -1,0 +1,5 @@
+room_number,username,rating,comment,timestamp
+101,geniale,4,Very clean and quiet,2026-02-10
+101,ksadegh,5,Perfect stay!,2026-02-12
+205,bel,2,Bed was uncomfortable,
+203,geniale,4
