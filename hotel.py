@@ -12,37 +12,12 @@ class User:
         self.credit = int(credit) 
         self.name_family = name_family
 
-
-    def menu (self):
- # main menu using while loop
-        while True:
-            print("Welcome to the Rozhin's hotel booking system!")
-            print("1. Sign up")
-            print("2. Log in")
-            print("3. Exit")
-            choice = input("what can we do for you?")
-            
-            
-            if choice == '1':
-                user = self.signup()
-                
-                break
-            elif choice == '2':
-                user=self.login()
-                
-                break
-            elif choice == '3':
-                print("Thank you for using the hotel booking system. Goodbye!")
-                break
-            else:
-                print("Invalid choice. Please try again.")
-
-
     def signup(self):
         
         name = input("Enter your name: ")
         family_name = input("Enter your family name: ")
         username = input("Enter your username: ")
+        # check if username already exists to avoid duplicates
         if self.check_user_exists(username):
             print("Username already exists.")
             return
@@ -74,6 +49,7 @@ class User:
                 if parts[0] == username:
                     return True
         return False
+        
 
     def login(self):
         username = input("Enter your username: ")
@@ -96,19 +72,7 @@ class User:
                 
         print("Invalid username or password.")
         return None
-
-    def check_user_exists(self, username):
-        if not os.path.exists("users.txt"):
-            print("No users yet. Please sign up first.")
-            return None
-        with open("users.txt", "r") as f:
-            for line in f:
-                parts = line.strip().split(",")
-                if parts[0] == username:
-                    return True
-        return False
-    #useless function but we can use it to load users from the file and return a list of users that we can use to check if the username already exists or not in the signup function and also to check if the username and password are correct in the login function        
-
+        
 # room management system
 class Room:
       
@@ -149,8 +113,6 @@ class Room_management_system:
         
     # we can add a room to the list of rooms and also to the rooms.txt file for whenever rooms are loaded again(depending on time that user adds room)
     # we can filter rooms based on criteria such as room type, capacity, price, wifi and status and return a list of rooms that match the criteria 
-
-
 
     def filter_rooms(self, room_type=None, max_price=None, wifi=None, status=None):
 
@@ -383,9 +345,27 @@ class Booking_management_system(User):
             return
 
         today = datetime.today()
+        new_lines = []
 
         with open("booking.txt", "r") as f:
             lines = f.readlines()
+
+        for line in lines:
+            parts = line.strip().split(",")
+            if len(parts) < 5:
+                new_lines.append(line)
+                continue
+
+            r_n, u, c_i, c_o, status = parts
+            check_out = datetime.strptime(c_o, "%Y-%m-%d")
+
+            if status == "active" and today > check_out:
+                status = "finished"
+
+            new_lines.append(f"{r_n},{u},{c_i},{c_o},{status}\n")
+
+        with open("booking.txt", "w") as f:
+            f.writelines(new_lines)
 
 
 
